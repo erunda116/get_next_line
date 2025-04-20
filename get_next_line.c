@@ -34,7 +34,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	j = 0;
 	all_size = ft_strlen(s1) + ft_strlen(s2);
 	result = malloc((all_size + 1) * sizeof(char));
-	if (!result || s1 == NULL || s2 == NULL)
+	if (!result || !s1 || !s2)
 		return (NULL);
 	while (s1[i] != '\0')
 	{
@@ -43,9 +43,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	}
 	while (s2[j] != '\0')
 	{
-		result[i] = s2[j];
-		i++;
-		j++;
+		result[i++] = s2[j++];
 	}
 	result[i] = '\0';
 	return (result);
@@ -56,8 +54,6 @@ char	*ft_strchr(const char *s, int c)
 	int	i;
 
 	i = 0;
-    if (!s)
-        return (NULL);
 	while (s[i] != '\0')
 	{
 		if (s[i] == (char)c)
@@ -121,7 +117,7 @@ char	*ft_strdup(const char *s)
 char    *get_next_line(int fd)
 {
     //declare buffer
-    static char *buffer;
+    char *buffer;
 
     //declare bytes of buffer
     ssize_t bytes_of_buff;
@@ -131,12 +127,6 @@ char    *get_next_line(int fd)
 
     //declare the line we will return
     char *line;
-
-    //declare start index to cut the line from leftovers
-    //int start_index; dont need it ????
-
-    //declare end index to cut the line from leftovers
-    //int end_index; dont need it ?????
 
     //declare the len of the string we will have to cut
     int len_of_line_to_return;
@@ -162,17 +152,35 @@ char    *get_next_line(int fd)
     //if we sucessfully allocated the memory we are going thru the while cycle until the end of file or until we encounter the \n on current buffer
     while (bytes_of_buff > 0 && !ft_strchr(leftovers, '\n'))
     {
-        //reading data piece by piece
-        bytes_of_buff = read(fd, buffer, BUFFER_SIZE);
-        
-        //storing data from buffer to leftovers by joining the string
-        leftovers = ft_strjoin(leftovers, buffer);
-        //if something went wrong with strjoin we are freeing the memory for leftovers and returning NULL
-        if (!leftovers)
-        {
-            free(leftovers);
-            return (NULL);
-        }
+            // read a piece of data into the buffer
+            bytes_of_buff = read(fd, buffer, BUFFER_SIZE);
+            if (bytes_of_buff <= 0)
+            {
+                // when read returns 0 or negative, we return the line if leftovers contain data
+                free(buffer);
+                if (bytes_of_buff == 0 && *leftovers)
+                {
+                    line = ft_strdup(leftovers);
+                    free(leftovers);
+                    leftovers = NULL;
+                    return (line);
+                }
+                free(leftovers);
+                leftovers = NULL;
+                return (NULL);
+            }
+    
+            // add read data to leftovers
+            buffer[bytes_of_buff] = '\0';
+            char *temp = leftovers;
+            leftovers = ft_strjoin(leftovers, buffer);
+            free(temp);
+    
+            if (!leftovers)
+            {
+                free(buffer);
+                return (NULL);
+            }
     }
     //freeing the memory from buffer
     free(buffer);
@@ -211,12 +219,24 @@ char    *get_next_line(int fd)
 #include <fcntl.h> // for open function
 int main()
 {
-    int file_d = open("test.txt", O_RDONLY | O_CREAT);
-    printf("%s\n", get_next_line(file_d));
-    printf("%s\n", get_next_line(file_d));
-    printf("%s\n", get_next_line(file_d));
-    printf("%s\n", get_next_line(file_d));
+    int file_d = open("test.txt", O_RDONLY);
 
+    char *line = get_next_line(file_d);
+    while (line)
+    {
+        printf("%s", line);
+        free(line);
+        line = get_next_line(file_d);
+    }
     close(file_d);
     return (0);
+
+    // int file_d = open("test.txt", O_RDONLY);
+
+    // printf("%s\n", get_next_line(file_d));
+    // printf("%s\n", get_next_line(file_d));
+    // printf("%s\n", get_next_line(file_d));
+    // printf("%s", get_next_line(file_d));
+    // close(file_d);
+    // return (0);
 }
