@@ -13,142 +13,24 @@
 #include "get_next_line.h"
 #include <stdio.h>
 
-size_t	ft_strlen(const char *str)
+//create a function to put data to the leftovers and free leftovers
+char    *create_leftover(int fd, char *leftovers)
 {
-	size_t	i;
-
-	i = 0;
-	while (str[i] != 0)
-		i++;
-	return (i);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	size_t	all_size;
-	size_t	i;
-	size_t	j;
-	char	*result;
-
-	i = 0;
-	j = 0;
-	all_size = ft_strlen(s1) + ft_strlen(s2);
-	result = malloc((all_size + 1) * sizeof(char));
-	if (!result || !s1 || !s2)
-		return (NULL);
-	while (s1[i] != '\0')
-	{
-		result[i] = s1[i];
-		i++;
-	}
-	while (s2[j] != '\0')
-	{
-		result[i++] = s2[j++];
-	}
-	result[i] = '\0';
-	return (result);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	int	i;
-
-	i = 0;
-	while (s[i] != '\0')
-	{
-		if (s[i] == (char)c)
-			return ((char *)(s + i));
-		i++;
-	}
-	if ((unsigned char)c == '\0')
-		return ((char *)(s + i));
-	return (NULL);
-}
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char	*substring;
-	size_t	i;
-
-	if (start > ft_strlen(s))
-	{
-		substring = malloc(1);
-		if (!substring)
-			return (NULL);
-		substring[0] = '\0';
-		return (substring);
-	}
-	i = 0;
-	if (len > ft_strlen(s) - start)
-		len = ft_strlen(s) - start;
-	substring = malloc((len + 1) * sizeof(char));
-	if (!substring)
-		return (NULL);
-	while (len > 0 && s[start] != '\0')
-	{
-		substring[i++] = s[start++];
-		len--;
-	}
-	substring[i] = '\0';
-	return (substring);
-}
-
-char	*ft_strdup(const char *s)
-{
-	size_t	size;
-	size_t	i;
-	char	*copy;
-
-	size = 0;
-	i = 0;
-	while (s[size] != '\0')
-		size++;
-	copy = malloc((size + 1) * sizeof(char));
-	if (!copy)
-		return (NULL);
-	while (i < size)
-	{
-		copy[i] = s[i];
-		i++;
-	}
-	copy[i] = '\0';
-	return (copy);
-}
-char    *get_next_line(int fd)
-{
+     //declare bytes of buffer (what read function is gonna return)
+    ssize_t bytes_of_buff;
     //declare buffer
     char *buffer;
 
-    //declare bytes of buffer
-    ssize_t bytes_of_buff;
-
-    //declare static variable for leftovers between calling a function (to not lose data between calls)
-    static char *leftovers;
-
-    //declare the line we will return
-    char *line;
-
-    //declare the len of the string we will have to cut
-    int len_of_line_to_return;
-
-    //initializing bytes of buffer to 1 to enter the cycle;
-    bytes_of_buff = 1;
-
-    //initializing leftovers to empty string to avoid an error on the call of functions ft_strchr and ft_strjoin
-    //we can't do like this leftovers = "" because it cause segmentation fault ??????? 
-    if (!leftovers)
-	    leftovers = ft_strdup("");
-
+    //creating temporary variable for !!!!!!!!!!!!!!!!
+    char *temp;
     //allocation of memory for buffer;
     buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
     
-    //if allocation fail we return null
-    if (!buffer)
+    //if allocation fail we return null or if file descriptor is not valid return NULL
+    if (!buffer || fd == -1)
         return (NULL);
-    //if file descriptor is not valid return NULL
-    if (fd == - 1)
-        return (NULL);
-
+    //initializing bytes of buffer to 1 to enter the cycle;
+    bytes_of_buff = 1;
     //if we sucessfully allocated the memory we are going thru the while cycle until the end of file or until we encounter the \n on current buffer
     while (bytes_of_buff > 0 && !ft_strchr(leftovers, '\n'))
     {
@@ -160,19 +42,19 @@ char    *get_next_line(int fd)
                 free(buffer);
                 if (bytes_of_buff == 0 && *leftovers)
                 {
-                    line = ft_strdup(leftovers);
-                    free(leftovers);
+                    leftovers = ft_strdup(leftovers);
+                    //free(leftovers);
                     leftovers = NULL;
-                    return (line);
+                    return (leftovers);
                 }
-                free(leftovers);
+                //free(leftovers);
                 leftovers = NULL;
                 return (NULL);
             }
     
             // add read data to leftovers
             buffer[bytes_of_buff] = '\0';
-            char *temp = leftovers;
+            temp = leftovers;
             leftovers = ft_strjoin(leftovers, buffer);
             free(temp);
     
@@ -184,14 +66,25 @@ char    *get_next_line(int fd)
     }
     //freeing the memory from buffer
     free(buffer);
+    return (leftovers);
+}
 
+//create a function to cut the line from the leftovers and change leftovers to new one
+//we should make leftover as pointer to a pointer because !!!!!!!!!!!!
+char    *result_line(char **leftovers)
+{
+    //declare the line we will return
+    char *line;
+
+    //declare the len of the string we will have to cut
+    int len_of_line_to_return;
     //now we have to cut the line from the leftovers and change leftovers to new one
     // if there are \n in leftovers we are: 
-    if (ft_strchr(leftovers, '\n'))
+    if (ft_strchr(*leftovers, '\n'))
     {
         //checking the len we should cut (len_of_line_to_return)
         len_of_line_to_return = 0;
-        while (leftovers[len_of_line_to_return] && leftovers[len_of_line_to_return] != '\n')
+        while ((*leftovers)[len_of_line_to_return] && (*leftovers)[len_of_line_to_return] != '\n')
         {
             len_of_line_to_return++;
         }
@@ -199,21 +92,53 @@ char    *get_next_line(int fd)
         len_of_line_to_return++;
 
         //cutting the string from leftovers from start to len we are checked before
-        line = ft_substr(leftovers, 0, len_of_line_to_return);
+        line = ft_substr(*leftovers, 0, len_of_line_to_return);
         //creating a new leftovers (all we have after \n)
-        char *new_leftovers = ft_strdup(leftovers + len_of_line_to_return);
+        char *new_leftovers = ft_strdup(*leftovers + len_of_line_to_return);
         //freeing leftovers
-        free(leftovers);
+        free(*leftovers);
         //making leftovers a new leftovers
-        leftovers = new_leftovers;
+        *leftovers = new_leftovers;
     } 
     else // if there are no \n in leftovers we are:
     {
         //duplicating to line what's left and freeing the leftovers
-        line = ft_strdup(leftovers);
-        free(leftovers);
-        leftovers = NULL;
+        line = ft_strdup(*leftovers);
+        free(*leftovers);
+        *leftovers = NULL;
     }
+    return (line);
+}
+char    *get_next_line(int fd)
+{
+    //declare buffer
+    //char *buffer;
+
+    //declare bytes of buffer
+    //ssize_t bytes_of_buff;
+
+    //declare static variable for leftovers between calling a function (to not lose data between calls)
+    static char *leftovers;
+
+    //declare the line we will return
+    char *line;
+
+    //declare the len of the string we will have to cut
+    //int len_of_line_to_return;
+
+    //initializing bytes of buffer to 1 to enter the cycle;
+    //bytes_of_buff = 1;
+
+    //initializing leftovers to empty string to avoid an error on the call of functions ft_strchr and ft_strjoin
+    //we can't do like this leftovers = "" because it cause segmentation fault ??????? 
+    if (!leftovers)
+	    leftovers = ft_strdup("");
+
+    leftovers = create_leftover(fd, leftovers);
+    //adding check for leftovers for !!!!!!!!!!!!
+    if (!leftovers)
+        return (NULL);
+    line = result_line(&leftovers);
     return (line);
 }
 #include <fcntl.h> // for open function
