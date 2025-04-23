@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_unils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: miakubov <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: miakubov <miakubov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 10:28:31 by miakubov          #+#    #+#             */
-/*   Updated: 2025/04/19 10:28:34 by miakubov         ###   ########.fr       */
+/*   Updated: 2025/04/23 21:17:47 by miakubov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
+//#include <stdio.h>
 size_t	ft_strlen(const char *str)
 {
 	size_t	i;
@@ -21,7 +21,26 @@ size_t	ft_strlen(const char *str)
 		i++;
 	return (i);
 }
+void	*ft_memcpy(void *dest, const void *src, size_t n)
+{
+	const unsigned char	*src1;
+	unsigned char		*dest1;
+	size_t				i;
 
+	if (n == 0 || dest == src)
+		return (dest);
+	dest1 = (unsigned char *)dest;
+	src1 = (const unsigned char *)src;
+	i = 0;
+	while (i < n)
+	{
+		dest1[i] = src1[i];
+		i++;
+	}
+	// static int counter = 0;
+    // printf("memcpy call: %d\n", ++counter);
+	return (dest);
+}
 char	*ft_strjoin(const char *s1, const char *s2)
 {
 	size_t	all_size;
@@ -45,6 +64,8 @@ char	*ft_strjoin(const char *s1, const char *s2)
 		result[i++] = s2[j++];
 	}
 	result[i] = '\0';
+	// static int counter = 0;
+    // printf("ft_strjoin call: %d\n", ++counter);
 	return (result);
 }
 
