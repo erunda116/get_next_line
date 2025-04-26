@@ -6,7 +6,7 @@
 /*   By: miakubov <miakubov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 10:27:59 by miakubov          #+#    #+#             */
-/*   Updated: 2025/04/26 15:54:15 by miakubov         ###   ########.fr       */
+/*   Updated: 2025/04/26 17:30:11 by miakubov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,6 @@ char *buffer, ssize_t *bytes_of_buff)
 	char	*temp;
 
 	*bytes_of_buff = read(fd, buffer, BUFFER_SIZE);
-	// if (*bytes_of_buff == -1)
-	// {
-	// 	free(leftovers);
-	// 	return (NULL);
-	// }
 	if (*bytes_of_buff <= 0)
 	{
 		if (*bytes_of_buff == 0 && leftovers && *leftovers != '\0')
@@ -122,16 +117,30 @@ char	*get_next_line(int fd)
 	line = result_line(&leftovers);
 	return (line);
 }
+/*
+#include <fcntl.h>
 
-/*#include <fcntl.h>
 int main()
 {
-      int file_d = open("test.txt", O_RDONLY);
- 
-    printf("%s\n", get_next_line(file_d));
-    printf("%s\n", get_next_line(file_d));
-    printf("%s\n", get_next_line(file_d));
-    printf("%s", get_next_line(file_d));
+    int file_d = open("test.txt", O_RDONLY);
+    char *line;
+
+    line = get_next_line(file_d);
+    while (line)
+    {
+        printf("%s", line);
+        free(line);
+        line = get_next_line(file_d);
+    }
     close(file_d);
     return (0);
+
+	//int file_d = open("test.txt", O_RDONLY);
+ 
+    //printf("%s\n", get_next_line(file_d));
+    //printf("%s\n", get_next_line(file_d));
+    //printf("%s\n", get_next_line(file_d));
+    //printf("%s", get_next_line(file_d));
+    //close(file_d);
+    //return (0);
 }*/
