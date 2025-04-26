@@ -6,27 +6,26 @@
 /*   By: miakubov <miakubov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 10:27:59 by miakubov          #+#    #+#             */
-/*   Updated: 2025/04/26 17:30:11 by miakubov         ###   ########.fr       */
+/*   Updated: 2025/04/26 18:19:16 by miakubov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-char	*while_for_lo(char *leftovers, int fd,
-char *buffer, ssize_t *bytes_of_buff)
+char	*while_for_lo(char *leftovers, int fd, char *buffer, ssize_t *bb)
 {
 	char	*temp;
 
-	*bytes_of_buff = read(fd, buffer, BUFFER_SIZE);
-	if (*bytes_of_buff <= 0)
+	*bb = read(fd, buffer, BUFFER_SIZE);
+	if (*bb <= 0)
 	{
-		if (*bytes_of_buff == 0 && leftovers && *leftovers != '\0')
+		if (*bb == 0 && leftovers && *leftovers != '\0')
 			return (leftovers);
 		free(leftovers);
 		return (NULL);
 	}
-	buffer[*bytes_of_buff] = '\0';
+	buffer[*bb] = '\0';
 	temp = leftovers;
 	leftovers = ft_strjoin(temp, buffer);
 	free(temp);
@@ -35,7 +34,7 @@ char *buffer, ssize_t *bytes_of_buff)
 
 char	*create_leftover(int fd, char *leftovers)
 {
-	ssize_t	bytes_of_buff;
+	ssize_t	bb;
 	char	*buffer;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
@@ -52,9 +51,9 @@ char	*create_leftover(int fd, char *leftovers)
 			return (NULL);
 		}
 	}
-	bytes_of_buff = 1;
-	while (bytes_of_buff > 0 && !ft_strchr(leftovers, '\n'))
-		leftovers = while_for_lo(leftovers, fd, buffer, &bytes_of_buff);
+	bb = 1;
+	while (bb > 0 && !ft_strchr(leftovers, '\n'))
+		leftovers = while_for_lo(leftovers, fd, buffer, &bb);
 	free(buffer);
 	return (leftovers);
 }
