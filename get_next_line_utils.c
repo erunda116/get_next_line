@@ -6,7 +6,7 @@
 /*   By: miakubov <miakubov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 10:28:31 by miakubov          #+#    #+#             */
-/*   Updated: 2025/04/23 21:17:47 by miakubov         ###   ########.fr       */
+/*   Updated: 2025/04/26 13:20:33 by miakubov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,3 +134,5 @@ char	*ft_strdup(const char *s)
 	copy[i] = '\0';
 	return (copy);
 }
+
+
