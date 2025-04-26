@@ -6,12 +6,12 @@
 /*   By: miakubov <miakubov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 10:28:31 by miakubov          #+#    #+#             */
-/*   Updated: 2025/04/26 13:20:33 by miakubov         ###   ########.fr       */
+/*   Updated: 2025/04/26 15:15:40 by miakubov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-//#include <stdio.h>
+
 size_t	ft_strlen(const char *str)
 {
 	size_t	i;
@@ -21,26 +21,7 @@ size_t	ft_strlen(const char *str)
 		i++;
 	return (i);
 }
-void	*ft_memcpy(void *dest, const void *src, size_t n)
-{
-	const unsigned char	*src1;
-	unsigned char		*dest1;
-	size_t				i;
 
-	if (n == 0 || dest == src)
-		return (dest);
-	dest1 = (unsigned char *)dest;
-	src1 = (const unsigned char *)src;
-	i = 0;
-	while (i < n)
-	{
-		dest1[i] = src1[i];
-		i++;
-	}
-	// static int counter = 0;
-    // printf("memcpy call: %d\n", ++counter);
-	return (dest);
-}
 char	*ft_strjoin(const char *s1, const char *s2)
 {
 	size_t	all_size;
@@ -64,8 +45,6 @@ char	*ft_strjoin(const char *s1, const char *s2)
 		result[i++] = s2[j++];
 	}
 	result[i] = '\0';
-	// static int counter = 0;
-    // printf("ft_strjoin call: %d\n", ++counter);
 	return (result);
 }
 
@@ -134,5 +113,3 @@ char	*ft_strdup(const char *s)
 	copy[i] = '\0';
 	return (copy);
 }
-
-
