@@ -6,7 +6,7 @@
 /*   By: miakubov <miakubov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 10:28:31 by miakubov          #+#    #+#             */
-/*   Updated: 2025/04/26 16:27:29 by miakubov         ###   ########.fr       */
+/*   Updated: 2025/05/01 17:26:17 by miakubov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,94 +22,76 @@ size_t	ft_strlen(const char *str)
 	return (i);
 }
 
-char	*ft_strjoin(const char *s1, const char *s2)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
-	size_t	all_size;
-	size_t	i;
-	size_t	j;
-	char	*result;
+	int		i;
+	int		j;
+	size_t	len;
+	char	*new;
+
+	if (!s2[0])
+		return (NULL);
+	i = 0;
+	j = 0;
+	if (!s1)
+		len = ft_strlen(s2);
+	else
+		len = ft_strlen(s1) + ft_strlen(s2);
+	new = malloc(sizeof(char) * (len + 1));
+	if (!new)
+		return (NULL);
+	while (s1 && s1[i])
+		new[j++] = s1[i++];
+	i = 0;
+	while (s2[i])
+		new[j++] = s2[i++];
+	new[j] = '\0';
+	free((char *)s1);
+	return (new);
+}
+
+void	clear_leftovers(char *leftovers)
+{
+	int	i;
+	int	j;
 
 	i = 0;
 	j = 0;
-	all_size = ft_strlen(s1) + ft_strlen(s2);
-	result = malloc((all_size + 1) * sizeof(char));
-	if (!result)
-		return (NULL);
-	while (s1[i] != '\0')
-	{
-		result[i] = s1[i];
+	while (leftovers[i] && leftovers[i] != '\n')
 		i++;
-	}
-	while (s2[j] != '\0')
-	{
-		result[i++] = s2[j++];
-	}
-	result[i] = '\0';
-	return (result);
+	if (leftovers[i] == '\n')
+		i++;
+	while (leftovers[i])
+		leftovers[j++] = leftovers[i++];
+	leftovers[j] = '\0';
 }
 
-char	*ft_strchr(const char *s, int c)
+int	if_newline(char *leftovers)
 {
 	int	i;
 
-	i = 0;
-	while (s[i] != '\0')
+	i = -1;
+	while (leftovers[++i])
 	{
-		if (s[i] == (char)c)
-			return ((char *)(s + i));
-		i++;
+		if (leftovers[i] == '\n')
+			return (1);
 	}
-	if ((unsigned char)c == '\0')
-		return ((char *)(s + i));
-	return (NULL);
+	return (0);
 }
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
+void	read_data(int fd, char **line, char *leftovers)
 {
-	char	*substring;
-	size_t	i;
+	ssize_t		bb;
 
-	if (start > ft_strlen(s))
+	bb = 0;
+	if (leftovers[0])
+		*line = ft_strjoin(*line, leftovers);
+	while (!if_newline(leftovers))
 	{
-		substring = malloc(1);
-		if (!substring)
-			return (NULL);
-		substring[0] = '\0';
-		return (substring);
+		bb = read(fd, leftovers, BUFFER_SIZE);
+		if (bb < 1)
+			break ;
+		leftovers[bb] = '\0';
+		*line = ft_strjoin(*line, leftovers);
 	}
-	i = 0;
-	if (len > ft_strlen(s) - start)
-		len = ft_strlen(s) - start;
-	substring = malloc((len + 1) * sizeof(char));
-	if (!substring)
-		return (NULL);
-	while (len > 0 && s[start] != '\0')
-	{
-		substring[i++] = s[start++];
-		len--;
-	}
-	substring[i] = '\0';
-	return (substring);
-}
-
-char	*ft_strdup(const char *s)
-{
-	size_t	size;
-	size_t	i;
-	char	*copy;
-
-	size = 0;
-	i = 0;
-	while (s[size] != '\0')
-		size++;
-	copy = malloc((size + 1) * sizeof(char));
-	if (!copy)
-		return (NULL);
-	while (i < size)
-	{
-		copy[i] = s[i];
-		i++;
-	}
-	copy[i] = '\0';
-	return (copy);
 }
